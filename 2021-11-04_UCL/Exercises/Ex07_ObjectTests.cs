@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Xunit;
@@ -23,7 +24,7 @@ namespace Exercises
             Person result = GetPerson();
 
             // Assert
-            throw new NotImplementedException();
+            result.Should().BeEquivalentTo(expected, o => o.ComparingByMembers<Person>());
         }
 
         [Fact]
@@ -42,7 +43,7 @@ namespace Exercises
             Machine instance = GetInstance();
 
             // Assert
-            throw new NotImplementedException();
+            instance.Should().BeEquivalentTo(expectedInstance, o => o.Excluding(machine => machine.Id));
         }
 
         [Fact]
@@ -58,7 +59,7 @@ namespace Exercises
             ISuperComputer computer = GetSuperComputer();
 
             // Assert
-            throw new NotImplementedException();
+            computer.Should().NotBeEquivalentTo(expected, m => m.RespectingRuntimeTypes());
         }
 
         [Fact]
@@ -69,6 +70,7 @@ namespace Exercises
             {
                 // Fill out the anonymous type, to match
                 // Inner.Inner.MyProperty = 42
+                Inner = new {Inner = new {MyProperty = 42}}
             };
 
             // Act
@@ -94,13 +96,13 @@ namespace Exercises
             AnnoyingClass result = GetResult();
 
             // Assert
-            throw new NotImplementedException();
+            result.Should().BeEquivalentTo(expected, o => o.ExcludingFields().Including(o => o.name));
         }
 
         [Fact]
         public void Using_WhenTypeIs()
         {
-            // * The model and its mapped version should be equivalent 
+            // * The model and its mapped version should be equivalent
             // * and DateTimes may vary up to 1 second.
 
             // Arrange
@@ -110,13 +112,13 @@ namespace Exercises
             object mappedModel = ModelMapper.Map(dasModel);
 
             // Assert
-            throw new NotImplementedException();
+            dasModel.Should().BeEquivalentTo(mappedModel, o => o.Using<DateTime>(d => d.Subject.Should().BeCloseTo(d.Expectation, TimeSpan.FromSeconds(1))).WhenTypeIs<DateTime>());
         }
 
         [Fact]
         public void Using_When()
         {
-            // * The model and its mapped version should be equivalent 
+            // * The model and its mapped version should be equivalent
             // * and the Created property may vary up to 1 second.
 
             // Arrange
@@ -126,7 +128,10 @@ namespace Exercises
             object mappedModel = ModelMapper.Map(dasModel);
 
             // Assert
-            throw new NotImplementedException();
+            dasModel.Should().BeEquivalentTo(mappedModel,
+                e => e.Using<DateTime>(d => d.Subject.Should().BeCloseTo(d.Expectation, TimeSpan.FromSeconds(1)))
+                    .When(t => t.Path.Contains("Created")));
+
         }
 
         #region Helpers
